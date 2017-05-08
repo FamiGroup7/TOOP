@@ -1,0 +1,25 @@
+﻿<Window x:Class="WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="560.593" Width="1129.06" Loaded="Window_Loaded">
+    <Grid>
+        <Menu x:Name="menu" Height="50" VerticalAlignment="Top" Margin="-10,-2,10.4,0">
+
+            <MenuItem Header="Add line" Click="addLineToolStripMenuItem_Click"/>
+            <MenuItem Header="Sum" Click="sumToolStripMenuItem_Click"/>
+            <MenuItem Header="Razn" Click="raznToolStripMenuItem_Click"/>
+            <Label x:Name="InfoTextBox" Content="Label" HorizontalAlignment="Left" Margin="580,6,0,0" VerticalAlignment="Top"/>
+        </Menu>
+        <ScrollViewer Height="472" Width="400" Margin="558,53,10.4,11.2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="True">
+            <Canvas x:Name="panel1" HorizontalAlignment="Right" 
+                Width="400"/>
+        </ScrollViewer>
+        <Canvas x:Name="pictureBox1" HorizontalAlignment="Left" Height="472" Margin="0,48,0,0" VerticalAlignment="Top" Width="553" MouseMove="pictureBox1_MouseMove" MouseDown="pictureBox1_MouseDown" Background="White" MouseUp="pictureBox1_MouseUp"/>
+
+
+    </Grid>
+</Window>
