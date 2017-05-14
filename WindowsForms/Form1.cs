@@ -15,9 +15,10 @@ namespace WindowsForms
         private ChartManager _chartManager;
         public const double ChartMargin = 15;
         Color selectedColor = Color.Red;
-        ChartPoint selectedPoint;
+        ChartPoint startPoint;
         double zoomX = 0.0, zoomY = 0.0;
         double stepZoomX = 0.0, stepZoomY = 0.0;
+        int drawingType = 1; //0 - point, 1 - line,
 
         public Form1()
         {
@@ -147,6 +148,14 @@ namespace WindowsForms
                     var y1 = points[0].Y;
                     graphics.FillRectangle(brush, (float)x1 - 2.5f, (float)y1 - 2.5f, 5, 5);
                 }
+                else if (points.Count == 2)
+                {
+                    var x1 = points[0].X;
+                    var y1 = points[0].Y;
+                    var x2 = points[1].X;
+                    var y2 = points[1].Y;
+                    graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+                }
             }
         }
 
@@ -245,10 +254,23 @@ namespace WindowsForms
             double x, y;
             getWindowCoordinates(out x, out y, e);
             ChartPoint point = new ChartPoint(e.X, e.Y);
-            ChartData data = new ChartData(point);
-            _chartManager.ChartDataList.Add(data);
+            //ChartData data = new ChartData(point);
+            //_chartManager.ChartDataList.Add(data);
             //selectedPoint = getNearClickPoint(x, y);
             pictureBox1.Invalidate();
+            if (startPoint != null)
+            {
+                List<ChartPoint> list = new List<ChartPoint>();
+                list.Add(startPoint);
+                list.Add(point);
+                ChartData data = new ChartData(list);
+                _chartManager.ChartDataList.Add(data);
+                startPoint = null;
+            }
+            else if (drawingType == 1)
+            {
+                startPoint = point;
+            }
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
