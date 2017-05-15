@@ -31,6 +31,12 @@ namespace Paint
             Points = new List<ChartPoint>();
             ChartColor = Color.Black;
         }
+
+        public int ChartType
+        {
+            get;
+            set;
+        }
         
         public List<ChartPoint> Points
         {
