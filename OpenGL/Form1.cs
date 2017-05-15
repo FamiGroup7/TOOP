@@ -18,6 +18,8 @@ namespace OpenGL
         private bool _loaded;
         Color selectedColor = Color.Red;
         ChartPoint selectedPoint;
+        ChartPoint startPoint;
+        int drawingType = 1; //1 - point, 2 - line, 3 - rectangle
 
         public Form1()
         {
@@ -32,8 +34,7 @@ namespace OpenGL
             List<ChartData> chartData;
             FileManager.InputFromFile("Resources/input.txt", out chartData);
             _chartManager.ChartDataList.AddRange(chartData);
-            CenterToScreen();
-            SetupPanel();            
+            CenterToScreen();         
         }
 
         private void initWindow()
@@ -43,87 +44,6 @@ namespace OpenGL
             pictureBox1.Height = height;
             pictureBox1.Width = ClientSize.Width * 2 / 3;
             panel1.Width = ClientSize.Width / 3;
-        }
-
-        private void SetupPanel()
-        {
-            if (_chartManager == null)
-            {
-                return;
-            }
-            panel1.Controls.Clear();
-            for (int i = 0, k = 0; i < _chartManager.ChartDataList.Count; i++, k++)
-            {
-                List<MyColor> colors = new List<MyColor>
-                {
-                    new MyColor {color = Color.Black, Name = "Black" },
-                    new MyColor {color = Color.Blue, Name = "Blue" },
-                    new MyColor {color = Color.Yellow, Name = "Yellow" },
-                    new MyColor {color = Color.Green, Name = "Green" }
-                };
-
-                ChartData chartData = _chartManager.ChartDataList[i];
-                chartData.ChartColor = colors[i % colors.Count].color;
-
-                Button buttonColor = new Button();
-                buttonColor.Size = new Size(60, 20);
-                buttonColor.Name = "" + i + "";
-                buttonColor.Location = new Point(20, 20 + (k * 40));
-                buttonColor.BackColor = chartData.ChartColor;
-                panel1.Controls.Add(buttonColor);
-
-                Button buttonShowPoints = new Button();
-                buttonShowPoints.Size = new Size(160, 20);
-                buttonShowPoints.Name = "" + i + "";
-                buttonShowPoints.Text = "Show points";
-                buttonShowPoints.Click += buttonShowPoints_Click;
-                buttonShowPoints.Location = new Point(100, 20 + (k * 40));
-                panel1.Controls.Add(buttonShowPoints);
-
-                ComboBox comboBox = new ComboBox();
-                comboBox.Name = "" + i + "";
-                comboBox.DataSource = colors;
-                comboBox.Size = new Size(75, 20);
-                comboBox.DisplayMember = "Name";
-                comboBox.Location = new Point(buttonColor.Location.X, buttonColor.Location.Y);
-                comboBox.SelectedIndexChanged += comboBox_SelectedIndexChanged;
-                panel1.Controls.Add(comboBox);
-
-                if (chartData.ShowPoints)
-                {
-                    Button buttonUpdate = new Button();
-                    buttonUpdate.Size = new Size(160, 20);
-                    buttonUpdate.Name = "" + i + "";
-                    buttonUpdate.Text = "Update";
-                    buttonUpdate.Click += buttonUpdate_Click;
-                    buttonUpdate.Location = new Point(280, 20 + (k * 40));
-                    panel1.Controls.Add(buttonUpdate);
-
-                    for (int j = 0; j < chartData.Points.Count; j++, k++)
-                    {
-                        TextBox textBoxX = new TextBox();
-                        textBoxX.Size = new Size(60, 20);
-                        textBoxX.Name = "Line" + i + "X" + j + "";
-                        textBoxX.Location = new Point(100, 20 + ((k + 1) * 40));
-                        textBoxX.Text = "" + chartData.Points[j].X + "";
-                        textBoxX.TextChanged += textBox_TextChanged;
-                        panel1.Controls.Add(textBoxX);
-
-                        TextBox textBoxY = new TextBox();
-                        textBoxY.Size = new Size(60, 20);
-                        textBoxY.Name = "Line" + i + "Y" + j + "";
-                        textBoxY.Location = new Point(180, 20 + ((k + 1) * 40));
-                        textBoxY.Text = "" + chartData.Points[j].Y + "";
-                        textBoxY.TextChanged += textBox_TextChanged;
-                        panel1.Controls.Add(textBoxY);
-                    }
-                }
-            }
-        }
-
-        private void textBox_TextChanged(object sender, EventArgs e)
-        {
-            TextBox textBox = (TextBox)sender;
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -137,15 +57,8 @@ namespace OpenGL
                 if (_chartManager.ChartDataList.Count != 0)
                 {
                     DrawChart();
-                    DrawAxisX();
-                    DrawAxisY();
                 }
                 pictureBox1.SwapBuffers();
-                if (_chartManager.ChartDataList.Count != 0)
-                {
-                    DrawTextX(e.Graphics);
-                    DrawTextY(e.Graphics);
-                }
             }
         }
 
@@ -153,150 +66,53 @@ namespace OpenGL
         {
             foreach (var chartData in _chartManager.ChartDataList)
             {
+                var pen = new Pen(chartData.ChartColor);
+                var brush = new SolidBrush(chartData.ChartColor);
                 var points = chartData.Points;
-                var width = pictureBox1.Width;
-                var height = pictureBox1.Height;
-                var margin = ChartMargin;
-                var minX = Math.Floor(_chartManager.MinX);
-                var maxX = Math.Ceiling(_chartManager.MaxX);
-                var minY = Math.Floor(_chartManager.MinY);
-                var maxY = Math.Ceiling(_chartManager.MaxY);
+
                 GL.Color3(chartData.ChartColor);
-                GL.Begin(PrimitiveType.LineStrip);
-                foreach (var point in points)
+                if (chartData.ChartType == 1)
                 {
-                    var x = margin + (point.X - minX) / (maxX - minX) * (width - margin);
-                    var y = height - margin - (point.Y - minY) / (maxY - minY) * (height - margin);
-                    GL.Vertex2(x, y);
+                    GL.PointSize(5);
+                    GL.Begin(PrimitiveType.Points);
+                    var x1 = points[0].X;
+                    var y1 = points[0].Y;
+                    GL.Vertex2(x1, y1);
+                    GL.End();
                 }
-                GL.End();
-                GL.PointSize(5);
-                GL.Begin(PrimitiveType.Points);
-                foreach (var point in points)
+                else if (chartData.ChartType == 2)
                 {
-                    var x = margin + (point.X - minX) / (maxX - minX) * (width - margin);
-                    var y = height - margin - (point.Y - minY) / (maxY - minY) * (height - margin);
-                    GL.Vertex2(x, y);
+                    GL.Begin(PrimitiveType.LineStrip);
+                    var x1 = points[0].X;
+                    var y1 = points[0].Y;
+                    var x2 = points[1].X;
+                    var y2 = points[1].Y;
+                    GL.Vertex2(x1, y1);
+                    GL.Vertex2(x2, y2);
+                    GL.End();
                 }
-                if (selectedPoint != null)
+                else if (chartData.ChartType == 3)
                 {
-                    GL.Color3(selectedColor);
-                    var x = margin + (selectedPoint.X - minX) / (maxX - minX) * (width - margin);
-                    var y = height - margin - (selectedPoint.Y - minY) / (maxY - minY) * (height - margin);
-                    GL.Vertex2(x, y);
+                    var x1 = chartData.MinX;
+                    var y1 = chartData.MinY;
+                    var x2 = chartData.MaxX;
+                    var y2 = chartData.MaxY;
+                    GL.Begin(PrimitiveType.Polygon);
+                    GL.Vertex2(x1, y1);
+                    GL.Vertex2(x1, y2);
+                    GL.Vertex2(x2, y2);
+                    GL.Vertex2(x2, y1);
+                    GL.End();
                 }
-                GL.End();
             }
         }
-
-        private void DrawTextX(Graphics graphics)
-        {
-            var width = pictureBox1.Width;
-            var height = pictureBox1.Height;
-            var margin = ChartMargin;
-            var minX = Math.Floor(_chartManager.MinX);
-            var maxX = Math.Ceiling(_chartManager.MaxX);
-            var length = maxX - minX;
-            var stepX = (length / 10);
-            var count = length / stepX;
-            var stepW = (width - margin) / count;
-            var x = margin;
-            var y = height - margin;
-            for (var i = 0; x < width; i++)
-            {
-                var text = Math.Round(minX + stepX * i, 2).ToString(CultureInfo.InvariantCulture);
-                var font = new Font("Arial", 8);
-                var brush = new SolidBrush(Color.Black);
-                var point = new PointF((float)x, (float)y);
-                graphics.DrawString(text, font, brush, point);
-                x += stepW;
-            }
-        }
-
-        private void DrawAxisX()
-        {
-            var width = pictureBox1.Width;
-            var height = pictureBox1.Height;
-            var margin = ChartMargin;
-            var minX = Math.Floor(_chartManager.MinX);
-            var maxX = Math.Ceiling(_chartManager.MaxX);
-            var length = maxX - minX;
-            var stepX = (length / 10);
-            var count = length / stepX;
-            var stepW = (width - margin) / count;
-            GL.Color3(Color.Black);
-            GL.Begin(PrimitiveType.Lines);
-            GL.Vertex2(margin, height - margin);
-            GL.Vertex2(width, height - margin);
-            GL.End();
-            var x = margin;
-            var y = height - margin;
-            for (var i = 0; x < width; i++)
-            {
-                GL.Begin(PrimitiveType.Lines);
-                GL.Vertex2(x, y);
-                GL.Vertex2(x, y - 5);
-                GL.End();
-                x += stepW;
-            }
-        }
-
-        private void DrawTextY(Graphics graphics)
-        {
-            var height = pictureBox1.Height;
-            var margin = ChartMargin;
-            var minY = Math.Floor(_chartManager.MinY);
-            var maxY = Math.Ceiling(_chartManager.MaxY);
-            var length = maxY - minY;
-            var stepY = (length / 10);
-            var count = length / stepY;
-            var stepH = (height - margin) / count;
-            var y = height - margin;
-            for (var i = 0; y > 0; i++)
-            {
-                var text = Math.Round(minY + stepY * i, 2).ToString(CultureInfo.InvariantCulture);
-                var font = new Font("Arial", 8);
-                var brush = new SolidBrush(Color.Black);
-                var point = new PointF(0, (float)y);
-                var format = new StringFormat { FormatFlags = StringFormatFlags.DirectionVertical };
-                graphics.DrawString(text, font, brush, point, format);
-                y -= stepH;
-            }
-        }
-
-        private void DrawAxisY()
-        {
-            var height = pictureBox1.Height;
-            var margin = ChartMargin;
-            var minY = Math.Floor(_chartManager.MinY);
-            var maxY = Math.Ceiling(_chartManager.MaxY);
-            var length = maxY - minY;
-            var stepY = (length / 10);
-            var count = length / stepY;
-            var stepH = (height - margin) / count;
-            GL.Color3(Color.Black);
-            GL.Begin(PrimitiveType.Lines);
-            GL.Vertex2(margin, 0);
-            GL.Vertex2(margin, height - margin);
-            GL.End();
-            var x = margin;
-            var y = height - margin;
-            for (var i = 0; y > 0; i++)
-            {
-                GL.Begin(PrimitiveType.Lines);
-                GL.Vertex2(x, y);
-                GL.Vertex2(x + 5, y);
-                GL.End();
-                y -= stepH;
-            }
-        }
+ 
 
         private void buttonShowPoints_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             ChartData chartData = _chartManager.ChartDataList[Convert.ToInt32(button.Name)];
             chartData.ShowPoints = !chartData.ShowPoints;
-            SetupPanel();
         }
 
         private void buttonUpdate_Click(object sender, EventArgs e)
@@ -340,7 +156,6 @@ namespace OpenGL
                 ChartData chartData = new ChartData();
                 FileManager.InputLineFromFile(fileName, out chartData);
                 _chartManager.ChartDataList.Add(chartData);
-                SetupPanel();
                 pictureBox1.Invalidate();
             }
         }
@@ -353,7 +168,6 @@ namespace OpenGL
             }
             initWindow();
             pictureBox1.Invalidate();
-            SetupPanel();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -375,17 +189,6 @@ namespace OpenGL
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_chartManager == null)
-            {
-                return;
-            }
-            if (_chartManager.ChartDataList.Count != 0)
-            {
-                double x, y;
-                getWindowCoordinates(out x, out y, e);
-                InfoTextBox.Text = "(" + Math.Round(x, 2) + ", " + Math.Round(y, 2) + ")";
-                Invalidate();
-            }
         }
 
         private void getWindowCoordinates(out double x, out double y, MouseEventArgs e)
@@ -405,8 +208,35 @@ namespace OpenGL
         {
             double x, y;
             getWindowCoordinates(out x, out y, e);
-            selectedPoint = getNearClickPoint(x, y);
+            ChartPoint point = new ChartPoint(e.X, e.Y);
+            if (drawingType == 1)
+            {
+                ChartData data = new ChartData(point);
+                data.ChartType = drawingType;
+                _chartManager.ChartDataList.Add(data);
+            }
+            else
+            {
+                if (startPoint != null)
+                {
+                    List<ChartPoint> list = new List<ChartPoint>();
+                    list.Add(startPoint);
+                    list.Add(point);
+                    ChartData data = new ChartData(list);
+                    data.ChartType = drawingType;
+                    _chartManager.ChartDataList.Add(data);
+                    startPoint = null;
+                }
+                else
+                {
+                    startPoint = point;
+                }
+            }
             pictureBox1.Invalidate();
+            //double x, y;
+            //getWindowCoordinates(out x, out y, e);
+            //selectedPoint = getNearClickPoint(x, y);
+            //pictureBox1.Invalidate();
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -447,14 +277,27 @@ namespace OpenGL
         {
             _chartManager.CreateSumChart();
             pictureBox1.Invalidate();
-            SetupPanel();
         }
 
         private void raznToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _chartManager.CreateRaznChart();
             pictureBox1.Invalidate();
-            SetupPanel();
+        }
+
+        private void pointButton_Click(object sender, EventArgs e)
+        {
+            drawingType = 1;
+        }
+
+        private void lineButton_Click(object sender, EventArgs e)
+        {
+            drawingType = 2;
+        }
+
+        private void rectangleButton_Click(object sender, EventArgs e)
+        {
+            drawingType = 3;
         }
     }
 }

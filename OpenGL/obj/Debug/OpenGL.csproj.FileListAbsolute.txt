@@ -43,3 +43,14 @@ H:\MyDocuments\Visual Studio 2015\Projects\Paint\OpenGL\obj\Debug\OpenGL.csproj.
 D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenGL.exe.config
 D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.exe
 D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.csprojResolveAssemblyReference.cache
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.Form1.resources
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.Properties.Resources.resources
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Debug\OpenGL.csproj.GenerateResource.Cache
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenGL.exe
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenGL.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenTK.Compatibility.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenTK.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\OpenTK.GLControl.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\Paint.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Debug\Paint.pdb
