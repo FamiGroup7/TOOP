@@ -189,6 +189,11 @@ namespace OpenGL
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            if (drawingType == 2 || drawingType == 3)
+            {
+                ChartData data = _chartManager.ChartDataList.Last();
+                int i = 0;
+            }
         }
 
         private void getWindowCoordinates(out double x, out double y, MouseEventArgs e)
@@ -206,12 +211,14 @@ namespace OpenGL
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
+            Color color = Color.FromArgb(redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value);
             double x, y;
             getWindowCoordinates(out x, out y, e);
             ChartPoint point = new ChartPoint(e.X, e.Y);
             if (drawingType == 1)
             {
                 ChartData data = new ChartData(point);
+                data.ChartColor = color;
                 data.ChartType = drawingType;
                 _chartManager.ChartDataList.Add(data);
             }
@@ -223,6 +230,7 @@ namespace OpenGL
                     list.Add(startPoint);
                     list.Add(point);
                     ChartData data = new ChartData(list);
+                    data.ChartColor = color;
                     data.ChartType = drawingType;
                     _chartManager.ChartDataList.Add(data);
                     startPoint = null;
@@ -233,10 +241,6 @@ namespace OpenGL
                 }
             }
             pictureBox1.Invalidate();
-            //double x, y;
-            //getWindowCoordinates(out x, out y, e);
-            //selectedPoint = getNearClickPoint(x, y);
-            //pictureBox1.Invalidate();
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -298,6 +302,81 @@ namespace OpenGL
         private void rectangleButton_Click(object sender, EventArgs e)
         {
             drawingType = 3;
+        }
+
+        private void redTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            redTextBox.Text = Convert.ToString(redTrackBar.Value);
+        }
+
+        private void greenTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            greenTextBox.Text = Convert.ToString(greenTrackBar.Value);
+        }
+
+        private void blueTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            blueTextBox.Text = Convert.ToString(blueTrackBar.Value);
+        }
+
+        private void redTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (redTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(redTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    redTextBox.Text = redTextBox.Text.Remove(redTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    redTrackBar.Value = Convert.ToInt16(redTextBox.Text);
+                }
+            }
+            else
+            {
+                redTextBox.Text = "0";
+            }
+        }
+
+        private void greenTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (greenTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(greenTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    greenTextBox.Text = greenTextBox.Text.Remove(greenTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    greenTrackBar.Value = Convert.ToInt16(greenTextBox.Text);
+                }
+            }
+            else
+            {
+                greenTextBox.Text = "0";
+            }
+        }
+
+        private void blueTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (blueTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(blueTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    blueTrackBar.Text = blueTextBox.Text.Remove(blueTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    blueTrackBar.Value = Convert.ToInt16(blueTextBox.Text);
+                }
+            }
+            else
+            {
+                blueTextBox.Text = "0";
+            }
         }
     }
 }
