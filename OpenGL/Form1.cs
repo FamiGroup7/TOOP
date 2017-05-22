@@ -82,27 +82,33 @@ namespace OpenGL
                 }
                 else if (chartData.ChartType == 2)
                 {
-                    GL.Begin(PrimitiveType.LineStrip);
-                    var x1 = points[0].X;
-                    var y1 = points[0].Y;
-                    var x2 = points[1].X;
-                    var y2 = points[1].Y;
-                    GL.Vertex2(x1, y1);
-                    GL.Vertex2(x2, y2);
-                    GL.End();
+                    if (points.Count > 1)
+                    {
+                        GL.Begin(PrimitiveType.LineStrip);
+                        var x1 = points[0].X;
+                        var y1 = points[0].Y;
+                        var x2 = points[1].X;
+                        var y2 = points[1].Y;
+                        GL.Vertex2(x1, y1);
+                        GL.Vertex2(x2, y2);
+                        GL.End();
+                    }
                 }
                 else if (chartData.ChartType == 3)
                 {
-                    var x1 = chartData.MinX;
-                    var y1 = chartData.MinY;
-                    var x2 = chartData.MaxX;
-                    var y2 = chartData.MaxY;
-                    GL.Begin(PrimitiveType.Polygon);
-                    GL.Vertex2(x1, y1);
-                    GL.Vertex2(x1, y2);
-                    GL.Vertex2(x2, y2);
-                    GL.Vertex2(x2, y1);
-                    GL.End();
+                    if (points.Count > 1)
+                    {
+                        var x1 = chartData.MinX;
+                        var y1 = chartData.MinY;
+                        var x2 = chartData.MaxX;
+                        var y2 = chartData.MaxY;
+                        GL.Begin(PrimitiveType.Polygon);
+                        GL.Vertex2(x1, y1);
+                        GL.Vertex2(x1, y2);
+                        GL.Vertex2(x2, y2);
+                        GL.Vertex2(x2, y1);
+                        GL.End();
+                    }
                 }
             }
         }
@@ -189,10 +195,20 @@ namespace OpenGL
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (drawingType == 2 || drawingType == 3)
+            if (startPoint != null)
             {
-                ChartData data = _chartManager.ChartDataList.Last();
-                int i = 0;
+                if (drawingType == 2 || drawingType == 3)
+                {
+                    ChartData data = _chartManager.ChartDataList.Last();
+                    ChartPoint point = new ChartPoint(e.X, e.Y);
+                    List<ChartPoint> list = data.Points;
+                    if (list.Count > 1)
+                    {
+                        list.RemoveAt(1);
+                    }
+                    list.Add(point);
+                    pictureBox1.Invalidate();
+                }
             }
         }
 
@@ -212,8 +228,6 @@ namespace OpenGL
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             Color color = Color.FromArgb(redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value);
-            double x, y;
-            getWindowCoordinates(out x, out y, e);
             ChartPoint point = new ChartPoint(e.X, e.Y);
             if (drawingType == 1)
             {
@@ -226,17 +240,23 @@ namespace OpenGL
             {
                 if (startPoint != null)
                 {
+                    ChartData data = _chartManager.ChartDataList.Last();
+                    List<ChartPoint> list = data.Points;
+                    if (list.Count > 1)
+                    {
+                        list.RemoveAt(1);
+                    }
+                    list.Add(point);
+                    startPoint = null;
+                }
+                else
+                {
                     List<ChartPoint> list = new List<ChartPoint>();
-                    list.Add(startPoint);
                     list.Add(point);
                     ChartData data = new ChartData(list);
                     data.ChartColor = color;
                     data.ChartType = drawingType;
                     _chartManager.ChartDataList.Add(data);
-                    startPoint = null;
-                }
-                else
-                {
                     startPoint = point;
                 }
             }
