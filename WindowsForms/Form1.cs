@@ -72,19 +72,25 @@ namespace WindowsForms
                 }
                 else if (chartData.ChartType == 2)
                 {
-                    var x1 = points[0].X;
-                    var y1 = points[0].Y;
-                    var x2 = points[1].X;
-                    var y2 = points[1].Y;
-                    graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+                    if (points.Count > 1)
+                    {
+                        var x1 = points[0].X;
+                        var y1 = points[0].Y;
+                        var x2 = points[1].X;
+                        var y2 = points[1].Y;
+                        graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+                    }
                 }
                 else if (chartData.ChartType == 3)
                 {
-                    var x1 = chartData.MinX;
-                    var y1 = chartData.MinY;
-                    var x2 = chartData.MaxX;
-                    var y2 = chartData.MaxY;
-                    graphics.FillRectangle(brush, (float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
+                    if (points.Count > 1)
+                    {
+                        var x1 = chartData.MinX;
+                        var y1 = chartData.MinY;
+                        var x2 = chartData.MaxX;
+                        var y2 = chartData.MaxY;
+                        graphics.FillRectangle(brush, (float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
+                    }
                 }
             }
         }
@@ -150,6 +156,21 @@ namespace WindowsForms
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            if (startPoint != null)
+            {
+                if (drawingType == 2 || drawingType == 3)
+                {
+                    ChartData data = _chartManager.ChartDataList.Last();
+                    ChartPoint point = new ChartPoint(e.X, e.Y);
+                    List<ChartPoint> list = data.Points;
+                    if (list.Count > 1)
+                    {
+                        list.RemoveAt(1);
+                    }
+                    list.Add(point);
+                    pictureBox1.Invalidate();
+                }
+            }
         }
 
         private void getWindowCoordinates(out double x, out double y, MouseEventArgs e)
@@ -167,29 +188,38 @@ namespace WindowsForms
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
+            Color color = Color.FromArgb(redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value);
             double x, y;
             getWindowCoordinates(out x, out y, e);
             ChartPoint point = new ChartPoint(e.X, e.Y);
             if (drawingType == 1)
             {
                 ChartData data = new ChartData(point);
+                data.ChartColor = color;
                 data.ChartType = drawingType;
                 _chartManager.ChartDataList.Add(data);
             }
-            else 
+            else
             {
                 if (startPoint != null)
                 {
-                    List<ChartPoint> list = new List<ChartPoint>();
-                    list.Add(startPoint);
+                    ChartData data = _chartManager.ChartDataList.Last();
+                    List<ChartPoint> list = data.Points;
+                    if (list.Count > 1)
+                    {
+                        list.RemoveAt(1);
+                    }
                     list.Add(point);
-                    ChartData data = new ChartData(list);
-                    data.ChartType = drawingType;
-                    _chartManager.ChartDataList.Add(data);
                     startPoint = null;
                 }
                 else
                 {
+                    List<ChartPoint> list = new List<ChartPoint>();
+                    list.Add(point);
+                    ChartData data = new ChartData(list);
+                    data.ChartColor = color;
+                    data.ChartType = drawingType;
+                    _chartManager.ChartDataList.Add(data);
                     startPoint = point;
                 }
             }
@@ -249,6 +279,81 @@ namespace WindowsForms
         private void rectangleButton_Click(object sender, EventArgs e)
         {
             drawingType = 3;
+        }
+
+        private void redTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            redTextBox.Text = Convert.ToString(redTrackBar.Value);
+        }
+
+        private void greenTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            greenTextBox.Text = Convert.ToString(greenTrackBar.Value);
+        }
+
+        private void blueTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            blueTextBox.Text = Convert.ToString(blueTrackBar.Value);
+        }
+
+        private void redTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (redTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(redTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    redTextBox.Text = redTextBox.Text.Remove(redTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    redTrackBar.Value = Convert.ToInt16(redTextBox.Text);
+                }
+            }
+            else
+            {
+                redTextBox.Text = "0";
+            }
+        }
+
+        private void greenTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (greenTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(greenTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    greenTextBox.Text = greenTextBox.Text.Remove(greenTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    greenTrackBar.Value = Convert.ToInt16(greenTextBox.Text);
+                }
+            }
+            else
+            {
+                greenTextBox.Text = "0";
+            }
+        }
+
+        private void blueTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (blueTextBox.Text != "")
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(blueTextBox.Text, "[^0-9]"))
+                {
+                    MessageBox.Show("Please enter only numbers.");
+                    blueTrackBar.Text = blueTextBox.Text.Remove(blueTextBox.Text.Length - 1);
+                }
+                else
+                {
+                    blueTrackBar.Value = Convert.ToInt16(blueTextBox.Text);
+                }
+            }
+            else
+            {
+                blueTextBox.Text = "0";
+            }
         }
 
         private void raznToolStripMenuItem_Click(object sender, EventArgs e)
