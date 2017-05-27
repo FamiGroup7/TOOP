@@ -7,6 +7,12 @@ namespace Paint
 {
     public class ChartData
     {
+        public enum ChartTypes
+        {
+            Point = 1,
+            Line,
+            Rectangle
+        }
         public ChartData()
         {
             Initialize();
@@ -32,7 +38,7 @@ namespace Paint
             ChartColor = Color.Black;
         }
 
-        public int ChartType
+        public ChartTypes ChartType
         {
             get;
             set;

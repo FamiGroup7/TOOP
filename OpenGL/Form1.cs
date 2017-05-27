@@ -14,12 +14,12 @@ namespace OpenGL
     {
         Graphics graphics;
         private ChartManager _chartManager;
-        public const double ChartMargin = 15;
         private bool _loaded;
         Color selectedColor = Color.Red;
         ChartPoint selectedPoint;
         ChartPoint startPoint;
-        int drawingType = 1; //1 - point, 2 - line, 3 - rectangle
+        ChartData.ChartTypes drawingType = ChartData.ChartTypes.Point;
+        bool isOpenGl;
 
         public Form1()
         {
@@ -32,15 +32,14 @@ namespace OpenGL
             initWindow();
             _chartManager = new ChartManager();
             List<ChartData> chartData;
-            FileManager.InputFromFile("Resources/input.txt", out chartData);
-            _chartManager.ChartDataList.AddRange(chartData);
+            //FileManager.InputFromFile("Resources/input.txt", out chartData);
+            //_chartManager.ChartDataList.AddRange(chartData);
             CenterToScreen();         
         }
 
         private void initWindow()
         {
-            int height = ClientSize.Height - MainMenuStrip.Height;
-            panel1.Height = height;
+            int height = ClientSize.Height;
             pictureBox1.Height = height;
             pictureBox1.Width = ClientSize.Width * 2 / 3;
             panel1.Width = ClientSize.Width / 3;
@@ -48,17 +47,69 @@ namespace OpenGL
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            if (_loaded)
+            if (isOpenGl)
             {
-                e.Graphics.Clear(Color.White);
-                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
+                if (_loaded)
+                {
+                    e.Graphics.Clear(Color.White);
+                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                    GL.MatrixMode(MatrixMode.Modelview);
+                    GL.LoadIdentity();
+                    if (_chartManager.ChartDataList.Count != 0)
+                    {
+                        DrawChart();
+                    }
+                    pictureBox1.SwapBuffers();
+                }
+            }
+            else
+            {
+                graphics = e.Graphics;
+                graphics.Clear(Color.White);
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 if (_chartManager.ChartDataList.Count != 0)
                 {
-                    DrawChart();
+                    DrawChart(e.Graphics);
                 }
-                pictureBox1.SwapBuffers();
+            }
+        }
+
+        private void DrawChart(Graphics graphics)
+        {
+            foreach (var chartData in _chartManager.ChartDataList)
+            {
+                var pen = new Pen(chartData.ChartColor);
+                var brush = new SolidBrush(chartData.ChartColor);
+                var points = chartData.Points;
+
+                if (chartData.ChartType == ChartData.ChartTypes.Point)
+                {
+                    var x1 = points[0].X;
+                    var y1 = points[0].Y;
+                    graphics.FillRectangle(brush, (float)x1 - 2.5f, (float)y1 - 2.5f, 5, 5);
+                }
+                else if (chartData.ChartType == ChartData.ChartTypes.Line)
+                {
+                    if (points.Count > 1)
+                    {
+                        var x1 = points[0].X;
+                        var y1 = points[0].Y;
+                        var x2 = points[1].X;
+                        var y2 = points[1].Y;
+                        graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+                    }
+                }
+                else if (chartData.ChartType == ChartData.ChartTypes.Rectangle)
+                {
+                    if (points.Count > 1)
+                    {
+                        var x1 = chartData.MinX;
+                        var y1 = chartData.MinY;
+                        var x2 = chartData.MaxX;
+                        var y2 = chartData.MaxY;
+                        graphics.FillRectangle(brush, (float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
+                    }
+                }
             }
         }
 
@@ -71,7 +122,7 @@ namespace OpenGL
                 var points = chartData.Points;
 
                 GL.Color3(chartData.ChartColor);
-                if (chartData.ChartType == 1)
+                if (chartData.ChartType == ChartData.ChartTypes.Point)
                 {
                     GL.PointSize(5);
                     GL.Begin(PrimitiveType.Points);
@@ -80,7 +131,7 @@ namespace OpenGL
                     GL.Vertex2(x1, y1);
                     GL.End();
                 }
-                else if (chartData.ChartType == 2)
+                else if (chartData.ChartType == ChartData.ChartTypes.Line)
                 {
                     if (points.Count > 1)
                     {
@@ -94,7 +145,7 @@ namespace OpenGL
                         GL.End();
                     }
                 }
-                else if (chartData.ChartType == 3)
+                else if (chartData.ChartType == ChartData.ChartTypes.Rectangle)
                 {
                     if (points.Count > 1)
                     {
@@ -110,59 +161,6 @@ namespace OpenGL
                         GL.End();
                     }
                 }
-            }
-        }
- 
-
-        private void buttonShowPoints_Click(object sender, EventArgs e)
-        {
-            Button button = (Button)sender;
-            ChartData chartData = _chartManager.ChartDataList[Convert.ToInt32(button.Name)];
-            chartData.ShowPoints = !chartData.ShowPoints;
-        }
-
-        private void buttonUpdate_Click(object sender, EventArgs e)
-        {
-            Button button = (Button)sender;
-            int i = Convert.ToInt32(button.Name);
-            ChartData chartData = _chartManager.ChartDataList[i];
-            for (int j = 0; j < chartData.Points.Count; j++)
-            {
-                ChartPoint point = chartData.Points[j];
-                TextBox textBoxX = (TextBox)panel1.Controls.Find("Line" + i + "X" + j + "", false).FirstOrDefault();
-                TextBox textBoxY = (TextBox)panel1.Controls.Find("Line" + i + "Y" + j + "", false).FirstOrDefault();
-                point.X = Convert.ToDouble(textBoxX.Text);
-                point.Y = Convert.ToDouble(textBoxY.Text);
-            }
-            pictureBox1.Invalidate();
-        }
-
-        private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComboBox combox = (ComboBox)sender;
-            MyColor color = (MyColor)combox.SelectedItem;
-            Button button = (Button)panel1.Controls[combox.Name];
-            button.BackColor = color.color;
-            _chartManager.ChartDataList[Convert.ToInt32(combox.Name)].ChartColor = color.color;
-            pictureBox1.Invalidate();
-        }
-
-        private void addLineToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog OFD = new OpenFileDialog();
-
-
-            OFD.Filter = "TXT files (*.txt)|*.txt|All files (*.*)|*.*";
-            OFD.RestoreDirectory = true;
-            string fileName;
-
-            if (OFD.ShowDialog() == DialogResult.OK)
-            {
-                fileName = OFD.FileName;   //Путь файла с начальным приближением
-                ChartData chartData = new ChartData();
-                FileManager.InputLineFromFile(fileName, out chartData);
-                _chartManager.ChartDataList.Add(chartData);
-                pictureBox1.Invalidate();
             }
         }
 
@@ -197,7 +195,7 @@ namespace OpenGL
         {
             if (startPoint != null)
             {
-                if (drawingType == 2 || drawingType == 3)
+                if (drawingType == ChartData.ChartTypes.Line || drawingType == ChartData.ChartTypes.Rectangle)
                 {
                     ChartData data = _chartManager.ChartDataList.Last();
                     ChartPoint point = new ChartPoint(e.X, e.Y);
@@ -212,24 +210,11 @@ namespace OpenGL
             }
         }
 
-        private void getWindowCoordinates(out double x, out double y, MouseEventArgs e)
-        {
-            var width = pictureBox1.Width;
-            var height = pictureBox1.Height;
-            var margin = ChartMargin;
-            var minX = Math.Floor(_chartManager.MinX);
-            var maxX = Math.Ceiling(_chartManager.MaxX);
-            var minY = Math.Floor(_chartManager.MinY);
-            var maxY = Math.Ceiling(_chartManager.MaxY);
-            x = (e.X - margin) / (width - margin) * (maxX - minX) + minX;
-            y = (height - margin - e.Y) / (height - margin) * (maxY - minY) + minY;
-        }
-
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             Color color = Color.FromArgb(redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value);
             ChartPoint point = new ChartPoint(e.X, e.Y);
-            if (drawingType == 1)
+            if (drawingType == ChartData.ChartTypes.Point)
             {
                 ChartData data = new ChartData(point);
                 data.ChartColor = color;
@@ -265,8 +250,21 @@ namespace OpenGL
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
-            double x, y;
-            getWindowCoordinates(out x, out y, e);
+            if (startPoint != null)
+            {
+                if (drawingType == ChartData.ChartTypes.Line || drawingType == ChartData.ChartTypes.Rectangle)
+                {
+                    ChartData data = _chartManager.ChartDataList.Last();
+                    ChartPoint point = new ChartPoint(e.X, e.Y);
+                    List<ChartPoint> list = data.Points;
+                    if (list.Count > 1)
+                    {
+                        list.RemoveAt(1);
+                    }
+                    list.Add(point);
+                    pictureBox1.Invalidate();
+                }
+            }
         }
 
         private ChartPoint getNearClickPoint(double x, double y)
@@ -311,17 +309,17 @@ namespace OpenGL
 
         private void pointButton_Click(object sender, EventArgs e)
         {
-            drawingType = 1;
+            drawingType = ChartData.ChartTypes.Point;
         }
 
         private void lineButton_Click(object sender, EventArgs e)
         {
-            drawingType = 2;
+            drawingType = ChartData.ChartTypes.Line;
         }
 
         private void rectangleButton_Click(object sender, EventArgs e)
         {
-            drawingType = 3;
+            drawingType = ChartData.ChartTypes.Rectangle;
         }
 
         private void redTrackBar_ValueChanged(object sender, EventArgs e)
@@ -397,6 +395,13 @@ namespace OpenGL
             {
                 blueTextBox.Text = "0";
             }
+        }
+
+        private void checkBoxIsOpenGl_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            isOpenGl = (checkBox.CheckState == CheckState.Checked);
+            pictureBox1.Invalidate();
         }
     }
 }
