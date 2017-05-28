@@ -82,6 +82,11 @@ namespace OpenGL
                 var brush = new SolidBrush(chartData.ChartColor);
                 var points = chartData.Points;
 
+                graphics.TranslateTransform(chartData.CenterX, chartData.CenterY);
+                graphics.RotateTransform(chartData.angle);
+                graphics.ScaleTransform(chartData.Scale, chartData.Scale);
+                graphics.TranslateTransform(-chartData.CenterX, -chartData.CenterY);
+
                 if (chartData.ChartType == ChartData.ChartTypes.Point)
                 {
                     var x1 = points[0].X;
@@ -110,6 +115,10 @@ namespace OpenGL
                         graphics.FillRectangle(brush, (float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
                     }
                 }
+                graphics.TranslateTransform(chartData.CenterX, chartData.CenterY);
+                graphics.RotateTransform(-chartData.angle);
+                graphics.ScaleTransform(1 / chartData.Scale, 1 / chartData.Scale);
+                graphics.TranslateTransform(-chartData.CenterX, -chartData.CenterY);
             }
         }
 
@@ -122,6 +131,10 @@ namespace OpenGL
                 var points = chartData.Points;
 
                 GL.Color3(chartData.ChartColor);
+                GL.Translate(chartData.CenterX, chartData.CenterY, 0);
+                GL.Rotate(chartData.angle, 0, 0, 1);
+                GL.Scale(chartData.Scale, chartData.Scale, 1);
+                GL.Translate(-chartData.CenterX, -chartData.CenterY, 0);
                 if (chartData.ChartType == ChartData.ChartTypes.Point)
                 {
                     GL.PointSize(5);
@@ -140,6 +153,7 @@ namespace OpenGL
                         var y1 = points[0].Y;
                         var x2 = points[1].X;
                         var y2 = points[1].Y;
+                        GL.Rotate(chartData.angle, 0, 1, 0);
                         GL.Vertex2(x1, y1);
                         GL.Vertex2(x2, y2);
                         GL.End();
@@ -161,6 +175,10 @@ namespace OpenGL
                         GL.End();
                     }
                 }
+                GL.Translate(chartData.CenterX, chartData.CenterY, 0);
+                GL.Rotate(-chartData.angle, 0, 0, 1);
+                GL.Scale(1 / chartData.Scale, 1 / chartData.Scale, 1);
+                GL.Translate(-chartData.CenterX, -chartData.CenterY, 0);
             }
         }
 
@@ -401,6 +419,34 @@ namespace OpenGL
         {
             CheckBox checkBox = (CheckBox)sender;
             isOpenGl = (checkBox.CheckState == CheckState.Checked);
+            pictureBox1.Invalidate();
+        }
+
+        private void pictureBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            ChartData data = _chartManager.ChartDataList.Last();
+            switch (e.KeyChar)
+            {
+                case (char)Keys.Escape:
+                    Application.Exit();
+                    break;
+
+                case 'q':
+                    data.angle += 10;
+                    break;
+
+                case 'e':
+                    data.angle -= 10;
+                    break;
+
+                case 'z':
+                    data.Scale *= 2;
+                    break;
+
+                case 'x':
+                    data.Scale /= 2;
+                    break;
+            }
             pictureBox1.Invalidate();
         }
     }

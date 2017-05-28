@@ -36,6 +36,8 @@ namespace Paint
         {
             Points = new List<ChartPoint>();
             ChartColor = Color.Black;
+            angle = 0;
+            Scale = 1;
         }
 
         public ChartTypes ChartType
@@ -92,6 +94,34 @@ namespace Paint
             {
                 return Points.Select(chartPoint => chartPoint.Y).Max();
             }
+        }
+
+        public float CenterX
+        {
+            get
+            {
+                return (float)((MaxX - MinX) / 2.0 + MinX);
+            }
+        }
+
+        public float CenterY
+        {
+            get
+            {
+                return (float)((MaxY - MinY) / 2.0 + MinY);
+            }
+        }
+
+        public float angle
+        {
+            get;
+            set;
+        }
+
+        public float Scale
+        {
+            get;
+            set;
         }
     }
 }
