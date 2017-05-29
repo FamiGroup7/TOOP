@@ -11,11 +11,14 @@ namespace Paint
     {
         public static List<ChartData> LoadFromFile(string path)
         {
-            List<ChartData> items;
-            using (StreamReader r = new StreamReader(path))
+            List<ChartData> items = new List<ChartData>();
+            if (File.Exists(path))
             {
-                string json = r.ReadToEnd();
-                items = JsonConvert.DeserializeObject<List<ChartData>>(json);
+                using (StreamReader r = new StreamReader(path))
+                {
+                    string json = r.ReadToEnd();
+                    items = JsonConvert.DeserializeObject<List<ChartData>>(json);
+                }
             }
             return items;
         }
