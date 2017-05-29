@@ -32,8 +32,8 @@ namespace OpenGL
             initWindow();
             _chartManager = new ChartManager();
             List<ChartData> chartData;
-            //FileManager.InputFromFile("Resources/input.txt", out chartData);
-            //_chartManager.ChartDataList.AddRange(chartData);
+            chartData = FileManager.LoadFromFile("save.txt");
+            _chartManager.ChartDataList.AddRange(chartData);
             CenterToScreen();         
         }
 
@@ -445,6 +445,10 @@ namespace OpenGL
 
                 case 'x':
                     data.Scale /= 2;
+                    break;
+
+                case 's':
+                    FileManager.SaveToFile("save.txt", _chartManager.ChartDataList);
                     break;
             }
             pictureBox1.Invalidate();

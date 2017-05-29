@@ -4,6 +4,11 @@ namespace Paint
 {
     public class ChartPoint
     {
+        public ChartPoint()
+        {
+
+        }
+
         public ChartPoint(double x, double y)
         {
             X = x;
