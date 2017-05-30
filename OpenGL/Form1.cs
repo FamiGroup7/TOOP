@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
 using Paint;
+using System.IO;
 
 namespace OpenGL
 {
@@ -31,9 +32,6 @@ namespace OpenGL
         {
             initWindow();
             _chartManager = new ChartManager();
-            List<ChartData> chartData;
-            chartData = FileManager.LoadFromFile("save.txt");
-            _chartManager.ChartDataList.AddRange(chartData);
             CenterToScreen();         
         }
 
@@ -452,6 +450,57 @@ namespace OpenGL
                     break;
             }
             pictureBox1.Invalidate();
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream myStream = null;
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            
+            openFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 1;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((myStream = openFileDialog1.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            List<ChartData> chartData;
+                            chartData = FileManager.LoadFromFile(Path.GetFullPath(openFileDialog1.FileName));
+                            _chartManager.ChartDataList.AddRange(chartData);
+                            pictureBox1.Invalidate();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream myStream;
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+            saveFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.RestoreDirectory = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if ((myStream = saveFileDialog1.OpenFile()) != null)
+                {
+                    myStream.Close();
+                    FileManager.SaveToFile(Path.GetFullPath(saveFileDialog1.FileName), _chartManager.ChartDataList);
+                    // Code to write the stream goes here.
+                }
+            }
         }
     }
 }

@@ -1,0 +1,16 @@
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenGL.exe.config
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenGL.exe
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenGL.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenTK.Compatibility.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenTK.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\OpenTK.GLControl.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\Paint.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\Newtonsoft.Json.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\Paint.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\bin\Release\Newtonsoft.Json.xml
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.csprojResolveAssemblyReference.cache
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.Form1.resources
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.Properties.Resources.resources
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.csproj.GenerateResource.Cache
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.exe
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\OpenGL\obj\Release\OpenGL.pdb

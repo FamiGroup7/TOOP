@@ -2,3 +2,9 @@ C:\Users\atonk\Source\Repos\paint\Paint\bin\Release\Paint.dll
 C:\Users\atonk\Source\Repos\paint\Paint\bin\Release\Paint.pdb
 C:\Users\atonk\Source\Repos\paint\Paint\obj\Release\Paint.dll
 C:\Users\atonk\Source\Repos\paint\Paint\obj\Release\Paint.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\bin\Release\Paint.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\bin\Release\Paint.pdb
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\bin\Release\Newtonsoft.Json.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\bin\Release\Newtonsoft.Json.xml
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\obj\Release\Paint.dll
+D:\OneDrive\Документы\Магистратура\2 семестр\Paint\Paint\obj\Release\Paint.pdb
